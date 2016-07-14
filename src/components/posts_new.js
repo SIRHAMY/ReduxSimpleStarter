@@ -1,10 +1,26 @@
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
 import { reduxForm } from 'redux-form';
 import { createPost } from '../actions/index';
 import { Link } from 'react-router';
 
 
 class PostsNew extends Component {
+
+    //I want access to this property from a parent component
+    static contextTypes = {
+        router: PropTypes.object
+    };
+
+    onSubmit(props) {
+        this.props.createPost(props)
+            .then(() => {
+                // Blog post ahs been created, navigate user to index
+                //Navigate by calling this.context.router.push with
+                //new path to navigate to 
+                this.context.router.push('/'); 
+            });
+    }
+
     render() {
 
         const { fields: {title, categories, content }, handleSubmit } = this.props;
@@ -17,7 +33,7 @@ class PostsNew extends Component {
         //We can pass in actionCreator to handleSubmit so that it gets called when handleSubmit called
         //Basically actioncReator that gets props from form if successful
         return (
-            <form onSubmit={handleSubmit(this.props.createPost)}>
+            <form onSubmit={ handleSubmit(this.onSubmit.bind(this)) }>
                 <h3>Create a new post</h3>
 
                 <div className={`form-group ${title.touched && title.invalid ? 'has-danger' : ''} `} >
